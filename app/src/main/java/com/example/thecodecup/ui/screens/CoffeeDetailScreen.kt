@@ -214,34 +214,58 @@ fun CoffeeDetailsScreen(
 
 @Composable
 fun CoffeeImageSection(coffee: Coffee) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        contentAlignment = Alignment.Center
     ) {
-        // Coffee Image 
-        Image(
-            painter = painterResource(coffee.imageRes),
-            contentDescription = coffee.name,
-            modifier = Modifier
-                .size(250.dp)
-                .clip(RoundedCornerShape(20.dp)),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Popular Badge 
-        if (coffee.isPopular) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Coffee Image với kích thước nhỏ hơn và sắc nét hơn
             Card(
-                colors = CardDefaults.cardColors(containerColor = CoffeeBrown.copy(alpha = 0.1f)),
-                shape = RoundedCornerShape(20.dp)
+                modifier = Modifier.size(180.dp), // Giảm từ 250dp xuống 180dp
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                Text(
-                    text = "⭐ Popular",
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    color = CoffeeBrown,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium
+                Image(
+                    painter = painterResource(coffee.imageRes),
+                    contentDescription = coffee.name,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(16.dp)),
+                    contentScale = ContentScale.Fit // Thay đổi từ Crop sang Fit để tránh mất nét
                 )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Popular Badge
+            if (coffee.isPopular) {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = CoffeeBrown.copy(alpha = 0.1f)
+                    ),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "⭐",
+                            fontSize = 14.sp
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Popular",
+                            color = CoffeeBrown,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
         }
     }
