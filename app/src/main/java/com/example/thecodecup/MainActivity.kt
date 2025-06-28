@@ -49,13 +49,11 @@ fun CoffeeApp() {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
 
-            // Show bottom bar only on main screens (not on splash)
+            // only show tool bar if we are on one of the main screens
             if (currentDestination?.route in listOf(
                     Screen.Home.route,
-                    Screen.MyCart.route,
                     Screen.Rewards.route,
-                    Screen.MyOrder.route,
-                    Screen.Profile.route
+                    Screen.MyOrder.route
                 )) {
                 BottomNavigationBar(navController)
             }
@@ -63,7 +61,7 @@ fun CoffeeApp() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Splash.route, // Start with splash
+            startDestination = Screen.Splash.route,
             modifier = Modifier.padding(innerPadding)
         ) {
             // Splash Screen
@@ -71,13 +69,9 @@ fun CoffeeApp() {
                 SplashScreen(navController)
             }
 
-            // Main Bottom Navigation Screens
+            // Main Bottom Navigation Screens (3 screens)
             composable(Screen.Home.route) {
                 HomeScreen(navController)
-            }
-
-            composable(Screen.MyCart.route) {
-                MyCartScreen(navController)
             }
 
             composable(Screen.Rewards.route) {
@@ -88,24 +82,33 @@ fun CoffeeApp() {
                 MyOrderScreen(navController)
             }
 
+            // Additional Screens (accessed from header)
+            composable(Screen.MyCart.route) {
+                MyCartScreen(navController)
+            }
+
             composable(Screen.Profile.route) {
                 ProfileScreen(navController)
             }
 
-            // Detail Screens with Arguments
+            // Coffee Details Screen with Arguments
             composable(
                 route = Screen.CoffeeDetails.route,
-                arguments = listOf(navArgument("coffee_id") { type = NavType.StringType })
+                arguments = listOf(navArgument(Screen.CoffeeDetails.COFFEE_ID_ARG) {
+                    type = NavType.StringType
+                })
             ) { backStackEntry ->
-                val coffeeId = backStackEntry.arguments?.getString("coffee_id") ?: ""
+                val coffeeId = backStackEntry.arguments?.getString(Screen.CoffeeDetails.COFFEE_ID_ARG) ?: ""
                 CoffeeDetailsScreen(navController, coffeeId)
             }
 
             composable(
                 route = Screen.OrderDetails.route,
-                arguments = listOf(navArgument("order_id") { type = NavType.StringType })
+                arguments = listOf(navArgument(Screen.OrderDetails.ORDER_ID_ARG) {
+                    type = NavType.StringType
+                })
             ) { backStackEntry ->
-                val orderId = backStackEntry.arguments?.getString("order_id") ?: ""
+                val orderId = backStackEntry.arguments?.getString(Screen.OrderDetails.ORDER_ID_ARG) ?: ""
                 OrderDetailsScreen(navController, orderId)
             }
 

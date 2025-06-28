@@ -12,10 +12,10 @@ import com.example.thecodecup.ui.theme.PrimaryColor
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         BottomNavItem.Home,
-        BottomNavItem.MyCart,
+        //BottomNavItem.MyCart,
         BottomNavItem.Rewards,
-        BottomNavItem.MyOrder,
-        BottomNavItem.Profile
+        BottomNavItem.MyOrder
+        //BottomNavItem.Profile
     )
 
     NavigationBar(

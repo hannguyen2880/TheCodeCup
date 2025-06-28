@@ -12,13 +12,15 @@ sealed class Screen(val route: String) {
     object Rewards : Screen(route = "rewards_screen")
     object MyOrder : Screen(route = "myorder_screen")
 
-    // Detail Screens with Arguments
-    object CoffeeDetails : Screen(route = "coffee_details/{coffee_id}") {
+    // Detail Screens with Parameters
+    object CoffeeDetails : Screen("coffee_details/{coffee_id}") {
         fun createRoute(coffeeId: String) = "coffee_details/$coffeeId"
+        const val COFFEE_ID_ARG = "coffee_id"
     }
 
-    object OrderDetails : Screen(route = "order_details/{order_id}") {
+    object OrderDetails : Screen("order_details/{order_id}") {
         fun createRoute(orderId: String) = "order_details/$orderId"
+        const val ORDER_ID_ARG = "order_id"
     }
 
     // Success & Status Screens
@@ -26,15 +28,15 @@ sealed class Screen(val route: String) {
     object RedeemRewards : Screen(route = "redeem_rewards_screen")
 
     // Additional Screens
-    object Search : Screen(route = "search_screen")
-    object Notifications : Screen(route = "notifications_screen")
-    object Settings : Screen(route = "settings_screen")
-    object EditProfile : Screen(route = "edit_profile_screen")
-    object PaymentMethods : Screen(route = "payment_methods_screen")
-    object OrderHistory : Screen(route = "order_history_screen")
+    object Search : Screen("search_screen")
+    object Notifications : Screen("notifications_screen")
+    object Settings : Screen("settings_screen")
+    object EditProfile : Screen("edit_profile_screen")
+    object PaymentMethods : Screen("payment_methods_screen")
+    object OrderHistory : Screen("order_history_screen")
 }
 
-// Bottom Navigation Items
+// Bottom Navigation Items - Only 3 items
 sealed class BottomNavItem(
     var title: String,
     var icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -44,12 +46,6 @@ sealed class BottomNavItem(
         title = "Home",
         icon = Icons.Filled.Home,
         route = Screen.Home.route
-    )
-
-    object MyCart : BottomNavItem(
-        title = "My Cart",
-        icon = Icons.Filled.ShoppingCart,
-        route = Screen.MyCart.route
     )
 
     object Rewards : BottomNavItem(
@@ -63,12 +59,6 @@ sealed class BottomNavItem(
         icon = Icons.Filled.List,
         route = Screen.MyOrder.route
     )
-
-    object Profile : BottomNavItem(
-        title = "Profile",
-        icon = Icons.Filled.Person,
-        route = Screen.Profile.route
-    )
 }
 
 // Navigation Arguments Helper
@@ -77,4 +67,13 @@ object NavigationArgs {
     const val ORDER_ID = "order_id"
     const val USER_ID = "user_id"
     const val REWARD_ID = "reward_id"
+}
+
+// Get all bottom navigation items
+fun getBottomNavItems(): List<BottomNavItem> {
+    return listOf(
+        BottomNavItem.Home,
+        BottomNavItem.Rewards,
+        BottomNavItem.MyOrder
+    )
 }

@@ -20,7 +20,7 @@ fun ProfileScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Profile Screen",
+            text = "Profile",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
