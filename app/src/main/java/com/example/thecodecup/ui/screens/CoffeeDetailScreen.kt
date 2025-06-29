@@ -1,4 +1,3 @@
-// ui/screens/CoffeeDetailsScreen.kt
 package com.example.thecodecup.ui.screens
 
 import androidx.compose.foundation.Image
@@ -11,10 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -46,7 +42,7 @@ fun CoffeeDetailsScreen(
     navController: NavController,
     coffeeId: String
 ) {
-    // Coffee details based on ID with model classes 
+    // Coffee details based on ID with model classes
     val coffee = remember(coffeeId) {
         when (coffeeId) {
             "americano" -> Coffee(
@@ -102,7 +98,7 @@ fun CoffeeDetailsScreen(
         }
     }
 
-    // Customization states with model enums 
+    // Customization states
     var quantity by remember { mutableStateOf(1) }
     var customization by remember {
         mutableStateOf(
@@ -115,9 +111,10 @@ fun CoffeeDetailsScreen(
             )
         )
     }
-    var isFavorite by remember { mutableStateOf(false) }
+    var isHot by remember { mutableStateOf(true) }
+    var iceLevel by remember { mutableStateOf(3) } // 1, 2, 3 ice cubes
 
-    // Dynamic price calculation with customization 
+    // Dynamic price calculation
     val totalPrice by remember(quantity, customization) {
         derivedStateOf {
             var price = coffee.price
@@ -132,7 +129,7 @@ fun CoffeeDetailsScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Header with Navigation 
+        // Header with Navigation
         TopAppBar(
             title = {
                 Text(
@@ -149,16 +146,6 @@ fun CoffeeDetailsScreen(
                 }
             },
             actions = {
-                // Favorite Toggle 
-                IconButton(onClick = { isFavorite = !isFavorite }) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "Favorite",
-                        tint = if (isFavorite) Color.Red else Color.Gray
-                    )
-                }
-
-                // Cart Preview Icon 
                 IconButton(onClick = { navController.navigate(Screen.MyCart.route) }) {
                     Icon(
                         imageVector = Icons.Default.ShoppingCart,
@@ -174,37 +161,36 @@ fun CoffeeDetailsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // Coffee Image and Basic Info 
+            // Coffee Image
             CoffeeImageSection(coffee = coffee)
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Coffee Details Section 
-            CoffeeInfoSection(coffee = coffee)
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Quantity Selector 
-            QuantitySection(
+            // Coffee Name and Quantity (same row)
+            CoffeeInfoSection(
+                coffee = coffee,
                 quantity = quantity,
                 onQuantityChange = { quantity = it }
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // Customization Options 
+            // Customization Options
             CustomizationSection(
                 customization = customization,
-                onCustomizationChange = { customization = it }
+                onCustomizationChange = { customization = it },
+                isHot = isHot,
+                onHotColdChange = { isHot = it },
+                iceLevel = iceLevel,
+                onIceLevelChange = { iceLevel = it }
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Add to Cart Section 
+            // Add to Cart Section
             AddToCartSection(
                 totalPrice = totalPrice,
                 onAddToCart = {
-                    // Add to Cart Logic - Navigate to Cart
                     navController.navigate(Screen.MyCart.route)
                 }
             )
@@ -217,17 +203,16 @@ fun CoffeeImageSection(coffee: Coffee) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Coffee Image với kích thước nhỏ hơn và sắc nét hơn
             Card(
-                modifier = Modifier.size(180.dp), // Giảm từ 250dp xuống 180dp
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                modifier = Modifier.size(140.dp),
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
             ) {
                 Image(
                     painter = painterResource(coffee.imageRes),
@@ -235,33 +220,32 @@ fun CoffeeImageSection(coffee: Coffee) {
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(16.dp)),
-                    contentScale = ContentScale.Fit // Thay đổi từ Crop sang Fit để tránh mất nét
+                    contentScale = ContentScale.Fit
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            //Spacer(modifier = Modifier.height(12.dp))
 
-            // Popular Badge
             if (coffee.isPopular) {
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = CoffeeBrown.copy(alpha = 0.1f)
                     ),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "⭐",
-                            fontSize = 14.sp
+                            fontSize = 12.sp
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(3.dp))
                         Text(
                             text = "Popular",
                             color = CoffeeBrown,
-                            fontSize = 12.sp,
+                            fontSize = 10.sp,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -272,162 +256,83 @@ fun CoffeeImageSection(coffee: Coffee) {
 }
 
 @Composable
-fun CoffeeInfoSection(coffee: Coffee) {
-    Column {
-        // Coffee Name and Rating 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = coffee.name,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-
-                Text(
-                    text = coffee.category,
-                    fontSize = 14.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-
-            // Rating Section 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Rating",
-                    tint = Color(0xFFFFD700),
-                    modifier = Modifier.size(20.dp)
-                )
-                Text(
-                    text = coffee.rating.toString(),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Description 
+fun CoffeeInfoSection(
+    coffee: Coffee,
+    quantity: Int,
+    onQuantityChange: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Coffee Name only
         Text(
-            text = coffee.description,
-            fontSize = 16.sp,
-            color = Color.Gray,
-            lineHeight = 24.sp
+            text = coffee.name,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Ingredients 
-        if (coffee.ingredients.isNotEmpty()) {
-            Text(
-                text = "Ingredients:",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Black
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                coffee.ingredients.take(3).forEach { ingredient ->
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFF5F5F5)
-                        ),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Text(
-                            text = ingredient,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                            fontSize = 12.sp,
-                            color = Color.Black
-                        )
-                    }
-                }
-            }
-        }
+        // Quantity Selector
+        QuantitySelector(
+            quantity = quantity,
+            onQuantityChange = onQuantityChange
+        )
     }
 }
 
 @Composable
-fun QuantitySection(
+fun QuantitySelector(
     quantity: Int,
     onQuantityChange: (Int) -> Unit
 ) {
-    Column {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        IconButton(
+            onClick = { if (quantity > 1) onQuantityChange(quantity - 1) },
+            enabled = quantity > 1,
+            modifier = Modifier
+                .size(36.dp)
+                .background(
+                    color = if (quantity > 1) CoffeeBrown else Color.Gray.copy(alpha = 0.3f),
+                    shape = RoundedCornerShape(8.dp)
+                )
+        ) {
+            Text(
+                text = "−",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+        }
+
         Text(
-            text = "Quantity",
+            text = quantity.toString(),
             fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.Black
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = Modifier.width(32.dp),
+            textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        IconButton(
+            onClick = { onQuantityChange(quantity + 1) },
+            modifier = Modifier
+                .size(36.dp)
+                .background(
+                    color = CoffeeBrown,
+                    shape = RoundedCornerShape(8.dp)
+                )
         ) {
-            // Decrease Button 
-            IconButton(
-                onClick = { if (quantity > 1) onQuantityChange(quantity - 1) },
-                enabled = quantity > 1,
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(
-                        color = if (quantity > 1) CoffeeBrown else Color.Gray.copy(alpha = 0.3f),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-            ) {
-                Text(
-                    text = "−",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
-
-            // Quantity Display 
             Text(
-                text = quantity.toString(),
-                fontSize = 20.sp,
+                text = "+",
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.width(40.dp),
-                textAlign = TextAlign.Center
+                color = Color.White
             )
-
-// Increase Button
-            IconButton(
-                onClick = { onQuantityChange(quantity + 1) },
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(
-                        color = CoffeeBrown,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-            ) {
-                Text(
-                    text = "+",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
         }
     }
 }
@@ -435,14 +340,32 @@ fun QuantitySection(
 @Composable
 fun CustomizationSection(
     customization: CoffeeCustomization,
-    onCustomizationChange: (CoffeeCustomization) -> Unit
+    onCustomizationChange: (CoffeeCustomization) -> Unit,
+    isHot: Boolean,
+    onHotColdChange: (Boolean) -> Unit,
+    iceLevel: Int,
+    onIceLevelChange: (Int) -> Unit
 ) {
     Column {
-        Text(
-            text = "Customization",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.Black
+        // Hot/Cold Selection with Icons
+        HotColdSelectionGroup(
+            title = "Select",
+            isHot = isHot,
+            onSelectionChange = onHotColdChange
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Size Selection
+        CustomizationGroup(
+            title = "Size",
+            options = CoffeeSize.values().map { it.displayName },
+            selectedIndex = customization.size.ordinal,
+            onSelectionChange = { index ->
+                onCustomizationChange(
+                    customization.copy(size = CoffeeSize.values()[index])
+                )
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -461,43 +384,215 @@ fun CustomizationSection(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Size Selection
-        CustomizationGroup(
-            title = "Select",
-            options = CoffeeSize.values().map { it.displayName },
-            selectedIndex = customization.size.ordinal,
-            onSelectionChange = { index ->
-                onCustomizationChange(
-                    customization.copy(size = CoffeeSize.values()[index])
-                )
-            }
+        // Ice Level Selection
+        IceLevelSelectionGroup(
+            title = "Ice",
+            iceLevel = iceLevel,
+            onIceLevelChange = onIceLevelChange
+        )
+    }
+}
+
+@Composable
+fun HotColdSelectionGroup(
+    title: String,
+    isHot: Boolean,
+    onSelectionChange: (Boolean) -> Unit
+) {
+    Column {
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.Black
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // Ice Option
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = "Ice",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Black
-            )
+            // Hot Option
+            Card(
+                modifier = Modifier
+                    .selectable(
+                        selected = isHot,
+                        onClick = { onSelectionChange(true) }
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isHot) CoffeeBrown else Color(0xFFF5F5F5)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_hot),
+                        contentDescription = "Hot",
+                        tint = if (isHot) Color.White else Color.Black,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Text(
+                        text = "Hot",
+                        color = if (isHot) Color.White else Color.Black,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
 
-            Switch(
-                checked = customization.hasIce,
-                onCheckedChange = { hasIce ->
-                    onCustomizationChange(customization.copy(hasIce = hasIce))
-                },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = CoffeeBrown,
-                    checkedTrackColor = CoffeeBrown.copy(alpha = 0.5f)
-                )
-            )
+            // Cold Option
+            Card(
+                modifier = Modifier
+                    .selectable(
+                        selected = !isHot,
+                        onClick = { onSelectionChange(false) }
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (!isHot) CoffeeBrown else Color(0xFFF5F5F5)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_cold),
+                        contentDescription = "Cold",
+                        tint = if (!isHot) Color.White else Color.Black,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Text(
+                        text = "Cold",
+                        color = if (!isHot) Color.White else Color.Black,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun IceLevelSelectionGroup(
+    title: String,
+    iceLevel: Int,
+    onIceLevelChange: (Int) -> Unit
+) {
+    Column {
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.Black
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Light Ice (1 cube)
+            Card(
+                modifier = Modifier
+                    .selectable(
+                        selected = iceLevel == 1,
+                        onClick = { onIceLevelChange(1) }
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (iceLevel == 1) CoffeeBrown else Color(0xFFF5F5F5)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_ice_cube),
+                        contentDescription = "Light Ice",
+                        tint = if (iceLevel == 1) Color.White else Color.Black,
+                        modifier = Modifier.size(12.dp)
+                    )
+                }
+            }
+
+            // Medium Ice (2 cubes)
+            Card(
+                modifier = Modifier
+                    .selectable(
+                        selected = iceLevel == 2,
+                        onClick = { onIceLevelChange(2) }
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (iceLevel == 2) CoffeeBrown else Color(0xFFF5F5F5)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_ice_cube),
+                        contentDescription = "Medium Ice",
+                        tint = if (iceLevel == 2) Color.White else Color.Black,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Icon(
+                        painter = painterResource(R.drawable.ic_ice_cube),
+                        contentDescription = "Medium Ice",
+                        tint = if (iceLevel == 2) Color.White else Color.Black,
+                        modifier = Modifier.size(12.dp)
+                    )
+                }
+            }
+
+            // Normal Ice (3 cubes)
+            Card(
+                modifier = Modifier
+                    .selectable(
+                        selected = iceLevel == 3,
+                        onClick = { onIceLevelChange(3) }
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (iceLevel == 3) CoffeeBrown else Color(0xFFF5F5F5)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_ice_cube),
+                        contentDescription = "Normal Ice",
+                        tint = if (iceLevel == 3) Color.White else Color.Black,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Icon(
+                        painter = painterResource(R.drawable.ic_ice_cube),
+                        contentDescription = "Normal Ice",
+                        tint = if (iceLevel == 3) Color.White else Color.Black,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Icon(
+                        painter = painterResource(R.drawable.ic_ice_cube),
+                        contentDescription = "Normal Ice",
+                        tint = if (iceLevel == 3) Color.White else Color.Black,
+                        modifier = Modifier.size(12.dp)
+                    )
+                }
+            }
         }
     }
 }
@@ -558,7 +653,6 @@ fun AddToCartSection(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Price Display
         Column {
             Text(
                 text = "Price",
@@ -573,7 +667,6 @@ fun AddToCartSection(
             )
         }
 
-        // Add to Cart Button
         Button(
             onClick = onAddToCart,
             colors = ButtonDefaults.buttonColors(

@@ -1,4 +1,3 @@
-// ui/screens/HomeScreen.kt
 package com.example.thecodecup.ui.screens
 
 import androidx.compose.foundation.Image
@@ -11,35 +10,37 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.thecodecup.R
 import com.example.thecodecup.data.model.Coffee
 import com.example.thecodecup.data.model.LoyaltyCard
+import com.example.thecodecup.data.repository.UserPreferencesRepository
 import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.theme.CoffeeBrown
-import com.example.thecodecup.ui.theme.CoffeeWhite
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
+    val context = LocalContext.current
+    val userRepository = remember { UserPreferencesRepository(context) }
+    val userProfile by userRepository.userProfile.collectAsStateWithLifecycle()
+
     // Coffee data with model classes
     val coffeeList = remember {
         listOf(
@@ -100,10 +101,10 @@ fun HomeScreen(navController: NavController) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Header Section
+        // Header Section with dynamic user name
         item {
             HeaderSection(
-                userName = "Anderson",
+                userName = userProfile.fullName,
                 onCartClick = { navController.navigate(Screen.MyCart.route) },
                 onProfileClick = { navController.navigate(Screen.Profile.route) }
             )
@@ -165,9 +166,10 @@ fun HeaderSection(
                 modifier = Modifier.size(40.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.ShoppingCart,
+                    painter = painterResource(R.drawable.ic_cart),
                     contentDescription = "My Cart",
-                    tint = Color.Black
+                    tint = Color.Black,
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
@@ -176,9 +178,10 @@ fun HeaderSection(
                 modifier = Modifier.size(40.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Person,
+                    painter = painterResource(R.drawable.ic_profile_),
                     contentDescription = "Profile",
-                    tint = Color.Black
+                    tint = Color.Black,
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
@@ -211,15 +214,14 @@ fun LoyaltyCardSection(
             ) {
                 Text(
                     text = "Loyalty card",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White
                 )
                 Text(
-                    text = "${loyaltyCard.currentStamps} / ${loyaltyCard.maxStamps}",
-                    color = Color.White,
+                    text = "${loyaltyCard.currentStamps}/${loyaltyCard.maxStamps}",
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal
+                    color = Color.White.copy(alpha = 0.8f)
                 )
             }
 

@@ -3,37 +3,42 @@ package com.example.thecodecup.ui.components
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.thecodecup.navigation.BottomNavItem
-import com.example.thecodecup.ui.theme.PrimaryColor
+import com.example.thecodecup.R
+import com.example.thecodecup.navigation.Screen
+import com.example.thecodecup.ui.theme.CoffeeBrown
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
-        BottomNavItem.Home,
-        //BottomNavItem.MyCart,
-        BottomNavItem.Rewards,
-        BottomNavItem.MyOrder
-        //BottomNavItem.Profile
+        BottomNavItem("Home", R.drawable.ic_home, Screen.Home.route),
+        BottomNavItem("Rewards", R.drawable.ic_rewards, Screen.Rewards.route),
+        BottomNavItem("My Order", R.drawable.ic_orders, Screen.MyOrder.route)
     )
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar(
         containerColor = Color.White,
-        contentColor = PrimaryColor
+        contentColor = CoffeeBrown
     ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
-
         items.forEach { item ->
             NavigationBarItem(
                 icon = {
                     Icon(
-                        imageVector = item.icon,
+                        painter = painterResource(id = item.icon),
                         contentDescription = item.title
                     )
                 },
-                label = { Text(item.title) },
+                label = {
+                    Text(
+                        text = item.title,
+                        color = if (currentRoute == item.route) CoffeeBrown else Color.Gray
+                    )
+                },
                 selected = currentRoute == item.route,
                 onClick = {
                     navController.navigate(item.route) {
@@ -42,12 +47,17 @@ fun BottomNavigationBar(navController: NavHostController) {
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PrimaryColor,
-                    selectedTextColor = PrimaryColor,
+                    selectedIconColor = CoffeeBrown,
                     unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray
+                    indicatorColor = CoffeeBrown.copy(alpha = 0.1f)
                 )
             )
         }
     }
 }
+
+data class BottomNavItem(
+    val title: String,
+    val icon: Int,
+    val route: String
+)
