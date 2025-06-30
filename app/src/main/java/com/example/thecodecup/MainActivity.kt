@@ -28,6 +28,7 @@ import com.example.thecodecup.ui.screens.*
 import com.example.thecodecup.ui.components.BottomNavigationBar
 import com.example.thecodecup.ui.theme.TheCodeCupTheme
 import com.example.thecodecup.ui.viewmodel.CartViewModel
+import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
 fun CoffeeApp() {
     val navController = rememberNavController()
     val cartViewModel: CartViewModel = viewModel()
+    val rewardsViewModel: RewardsViewModel = viewModel()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -83,7 +85,7 @@ fun CoffeeApp() {
             }
 
             composable(Screen.MyCart.route) {
-                MyCartScreen(navController, cartViewModel) // Truyền cartViewModel
+                MyCartScreen(navController, cartViewModel, rewardsViewModel)
             }
 
             composable(Screen.Profile.route) {
@@ -97,7 +99,7 @@ fun CoffeeApp() {
                 })
             ) { backStackEntry ->
                 val coffeeId = backStackEntry.arguments?.getString(Screen.CoffeeDetails.COFFEE_ID_ARG) ?: ""
-                CoffeeDetailsScreen(navController, coffeeId, cartViewModel) // Truyền cartViewModel
+                CoffeeDetailsScreen(navController, coffeeId, cartViewModel)
             }
 
             composable(
@@ -110,12 +112,12 @@ fun CoffeeApp() {
                 OrderDetailsScreen(navController, orderId)
             }
 
-            composable(Screen.OrderSuccess.route) {
-                OrderSuccessScreen(navController)
+            composable(Screen.Rewards.route) {
+                RewardsScreen(navController, rewardsViewModel)
             }
 
             composable(Screen.RedeemRewards.route) {
-                RedeemRewardsScreen(navController)
+                RedeemRewardsScreen(navController, rewardsViewModel)
             }
         }
     }

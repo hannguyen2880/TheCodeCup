@@ -32,12 +32,14 @@ import com.example.thecodecup.R
 import com.example.thecodecup.data.model.*
 import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.viewmodel.CartViewModel
+import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyCartScreen(
     navController: NavController,
-    viewModel: CartViewModel = viewModel()
+    viewModel: CartViewModel = viewModel(),
+    rewardsViewModel: RewardsViewModel? = null
 ) {
     val cartItems = viewModel.cartItems
     val totalPrice = viewModel.getTotalPrice()
@@ -134,11 +136,18 @@ fun MyCartScreen(
                                 )
                             }
 
+                            // In MyCartScreen.kt, update the checkout button:
                             Button(
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(0xFF324A59)
                                 ),
-                                onClick = { navController.navigate(Screen.OrderSuccess.route) },
+                                onClick = {
+                                    rewardsViewModel?.let { rewards ->
+                                        rewardsViewModel.onOrderCompleted(totalPrice)
+                                        viewModel.clearCart()
+                                        navController.navigate(Screen.OrderSuccess.route)
+                                    }
+                                },
                                 shape = RoundedCornerShape(16.dp),
                                 contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
                             ) {
