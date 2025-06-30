@@ -23,14 +23,6 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun OrderSuccessScreen(navController: NavController) {
-    // Auto-navigate after 3 seconds
-    LaunchedEffect(Unit) {
-        delay(3000)
-        navController.navigate(Screen.MyOrder.route) {
-            popUpTo(Screen.Home.route)
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
