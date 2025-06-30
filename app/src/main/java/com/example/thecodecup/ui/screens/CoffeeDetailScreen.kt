@@ -2,7 +2,6 @@ package com.example.thecodecup.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
@@ -35,12 +34,15 @@ import com.example.thecodecup.data.model.MilkType
 import com.example.thecodecup.data.model.SweetnessLevel
 import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.theme.CoffeeBrown
+import com.example.thecodecup.ui.viewmodel.CartViewModel
+import com.example.thecodecup.data.model.CartItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoffeeDetailsScreen(
     navController: NavController,
-    coffeeId: String
+    coffeeId: String,
+    cartViewModel: CartViewModel
 ) {
     // Coffee details based on ID with model classes
     val coffee = remember(coffeeId) {
@@ -186,10 +188,14 @@ fun CoffeeDetailsScreen(
             )
 
             Spacer(modifier = Modifier.height(32.dp))
-
-            // Add to Cart Section
             AddToCartSection(
+                coffee = coffee,
+                customization = customization,
+                quantity = quantity,
+                isHot = isHot,
+                iceLevel = iceLevel,
                 totalPrice = totalPrice,
+                cartViewModel = cartViewModel,
                 onAddToCart = {
                     navController.navigate(Screen.MyCart.route)
                 }
@@ -645,7 +651,13 @@ fun CustomizationGroup(
 
 @Composable
 fun AddToCartSection(
+    coffee: Coffee,
+    customization: CoffeeCustomization,
+    quantity: Int,
+    isHot: Boolean,
+    iceLevel: Int,
     totalPrice: Double,
+    cartViewModel: CartViewModel,
     onAddToCart: () -> Unit
 ) {
     Row(
@@ -668,7 +680,19 @@ fun AddToCartSection(
         }
 
         Button(
-            onClick = onAddToCart,
+            onClick = {
+                val cartItem = CartItem(
+                    id = "${coffee.id}_${System.currentTimeMillis()}",
+                    coffee = coffee,
+                    customization = customization,
+                    quantity = quantity,
+                    totalPrice = totalPrice,
+                    isHot = isHot,
+                    iceLevel = iceLevel
+                )
+                cartViewModel.addItem(cartItem)
+                onAddToCart()
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = CoffeeBrown
             ),
@@ -692,6 +716,7 @@ fun AddToCartSection(
 fun CoffeeDetailsScreenPreview() {
     CoffeeDetailsScreen(
         navController = rememberNavController(),
-        coffeeId = "americano"
+        coffeeId = "americano",
+        cartViewModel = CartViewModel()
     )
 }

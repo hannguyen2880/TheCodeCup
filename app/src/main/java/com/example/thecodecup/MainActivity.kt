@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -26,6 +27,8 @@ import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.screens.*
 import com.example.thecodecup.ui.components.BottomNavigationBar
 import com.example.thecodecup.ui.theme.TheCodeCupTheme
+import com.example.thecodecup.ui.viewmodel.CartViewModel
+import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -42,6 +45,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CoffeeApp() {
     val navController = rememberNavController()
+    val cartViewModel: CartViewModel = viewModel()
+    val rewardsViewModel: RewardsViewModel = viewModel()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -49,7 +54,6 @@ fun CoffeeApp() {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
 
-            // only show tool bar if we are on one of the main screens
             if (currentDestination?.route in listOf(
                     Screen.Home.route,
                     Screen.Rewards.route,
@@ -64,12 +68,10 @@ fun CoffeeApp() {
             startDestination = Screen.Splash.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            // Splash Screen
             composable(Screen.Splash.route) {
                 SplashScreen(navController)
             }
 
-            // Main Bottom Navigation Screens (3 screens)
             composable(Screen.Home.route) {
                 HomeScreen(navController)
             }
@@ -82,16 +84,14 @@ fun CoffeeApp() {
                 MyOrderScreen(navController)
             }
 
-            // Additional Screens (accessed from header)
             composable(Screen.MyCart.route) {
-                MyCartScreen(navController)
+                MyCartScreen(navController, cartViewModel, rewardsViewModel)
             }
 
             composable(Screen.Profile.route) {
                 ProfileScreen(navController)
             }
 
-            // Coffee Details Screen with Arguments
             composable(
                 route = Screen.CoffeeDetails.route,
                 arguments = listOf(navArgument(Screen.CoffeeDetails.COFFEE_ID_ARG) {
@@ -99,7 +99,7 @@ fun CoffeeApp() {
                 })
             ) { backStackEntry ->
                 val coffeeId = backStackEntry.arguments?.getString(Screen.CoffeeDetails.COFFEE_ID_ARG) ?: ""
-                CoffeeDetailsScreen(navController, coffeeId)
+                CoffeeDetailsScreen(navController, coffeeId, cartViewModel)
             }
 
             composable(
@@ -112,13 +112,12 @@ fun CoffeeApp() {
                 OrderDetailsScreen(navController, orderId)
             }
 
-            // Success Screen
-            composable(Screen.OrderSuccess.route) {
-                OrderSuccessScreen(navController)
+            composable(Screen.Rewards.route) {
+                RewardsScreen(navController, rewardsViewModel)
             }
 
             composable(Screen.RedeemRewards.route) {
-                RedeemRewardsScreen(navController)
+                RedeemRewardsScreen(navController, rewardsViewModel)
             }
         }
     }
@@ -127,14 +126,13 @@ fun CoffeeApp() {
 @Composable
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
-        delay(3000) // 3 seconds
+        delay(3000)
         navController.navigate(Screen.Home.route) {
             popUpTo(Screen.Splash.route) { inclusive = true }
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background Image
         Image(
             painter = painterResource(id = R.drawable.splash_background),
             contentDescription = "Splash Background",
@@ -142,7 +140,6 @@ fun SplashScreen(navController: NavController) {
             contentScale = ContentScale.Crop
         )
 
-        // Content over background
         Column(
             modifier = Modifier
                 .fillMaxSize()
