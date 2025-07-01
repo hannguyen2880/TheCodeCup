@@ -88,6 +88,10 @@ fun CoffeeApp() {
                 MyCartScreen(navController, cartViewModel, rewardsViewModel)
             }
 
+            composable(Screen.OrderSuccess.route) {
+                OrderSuccessScreen(navController)
+            }
+
             composable(Screen.Profile.route) {
                 ProfileScreen(navController)
             }
