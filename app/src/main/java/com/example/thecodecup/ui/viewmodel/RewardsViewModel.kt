@@ -1,61 +1,58 @@
 package com.example.thecodecup.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.example.thecodecup.data.model.RewardItem
+import com.example.thecodecup.data.model.PointsHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-data class RewardItem(
-    val id: String,
-    val title: String,
-    val description: String,
-    val pointsCost: Int,
-    val imageRes: Int,
-    val isAvailable: Boolean = true
-)
-
 class RewardsViewModel : ViewModel() {
-    private val _currentPoints = MutableStateFlow(150)
-    val currentPoints: StateFlow<Int> = _currentPoints.asStateFlow()
+    private val _userPoints = MutableStateFlow(2750)
+    val userPoints: StateFlow<Int> = _userPoints.asStateFlow()
 
-    private val _stampsCollected = MutableStateFlow(4)
-    val stampsCollected: StateFlow<Int> = _stampsCollected.asStateFlow()
+    private val _pointsHistory = MutableStateFlow(
+        listOf(
+            PointsHistory(
+                id = "1",
+                coffeeName = "Americano",
+                date = "24 June",
+                time = "12:30 PM",
+                pointsEarned = 12
+            ),
+            PointsHistory(
+                id = "2",
+                coffeeName = "Cappuccino",
+                date = "23 June",
+                time = "2:15 PM",
+                pointsEarned = 15
+            ),
+            PointsHistory(
+                id = "3",
+                coffeeName = "Mocha",
+                date = "22 June",
+                time = "10:30 AM",
+                pointsEarned = 18
+            ),
+            PointsHistory(
+                id = "4",
+                coffeeName = "Flat White",
+                date = "21 June",
+                time = "3:20 PM",
+                pointsEarned = 16
+            )
+        )
+    )
+    val pointsHistory: StateFlow<List<PointsHistory>> = _pointsHistory.asStateFlow()
 
-    private val _rewardHistory = MutableStateFlow<List<String>>(emptyList())
-    val rewardHistory: StateFlow<List<String>> = _rewardHistory.asStateFlow()
+    fun redeemReward(reward: RewardItem) {
+        val currentPoints = _userPoints.value
+        if (currentPoints >= reward.pointsRequired) {
+            _userPoints.value = currentPoints - reward.pointsRequired
+        }
+    }
 
     fun addPoints(points: Int) {
-        _currentPoints.value += points
-    }
-
-    fun addStamp() {
-        if (_stampsCollected.value < 8) {
-            _stampsCollected.value += 1
-            if (_stampsCollected.value == 8) {
-                // Free coffee when 8 stamps collected
-                _stampsCollected.value = 0
-                addRewardToHistory("Free Coffee Redeemed!")
-            }
-        }
-    }
-
-    fun redeemReward(reward: RewardItem): Boolean {
-        return if (_currentPoints.value >= reward.pointsCost) {
-            _currentPoints.value -= reward.pointsCost
-            addRewardToHistory("Redeemed: ${reward.title}")
-            true
-        } else {
-            false
-        }
-    }
-
-    private fun addRewardToHistory(reward: String) {
-        _rewardHistory.value = _rewardHistory.value + reward
-    }
-
-    fun onOrderCompleted(orderAmount: Double) {
-        val pointsEarned = (orderAmount * 10).toInt() // 10 points per dollar
-        addPoints(pointsEarned)
-        addStamp()
+        _userPoints.value += points
     }
 }

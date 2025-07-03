@@ -73,37 +73,6 @@ fun OrderSuccessScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Estimated time
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF324A59).copy(alpha = 0.1f)
-            )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Estimated preparation time",
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "15-20 minutes",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF324A59)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
         Button(
             onClick = {
                 navController.navigate(Screen.MyOrder.route) {

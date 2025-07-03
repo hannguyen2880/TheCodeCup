@@ -85,8 +85,11 @@
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/MainActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/screens/MyCartScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/screens/MyCartScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/screens/OrderSuccessScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/screens/OrderSuccessScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/screens/RedeemRewardsScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/screens/RedeemRewardsScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/screens/RewardsScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/screens/RewardsScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/viewmodel/CartViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/viewmodel/CartViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/viewmodel/RewardsViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/thecodecup/ui/viewmodel/RewardsViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -260,12 +263,12 @@
       <map>
         <entry key="com.example.thecodecup">
           <value>
-            <CheckInfo lastCheckTimestamp="1751192670530" />
+            <CheckInfo lastCheckTimestamp="1751517056007" />
           </value>
         </entry>
         <entry key="com.example.thecodecup.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1751192670544" />
+            <CheckInfo lastCheckTimestamp="1751517056013" />
           </value>
         </entry>
       </map>
