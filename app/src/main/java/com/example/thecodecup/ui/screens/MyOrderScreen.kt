@@ -338,6 +338,7 @@ fun OrderCard(
                     Text(
                         text = "Mark as Completed",
                         fontSize = 14.sp,
+                        color = Color.White,
                         fontWeight = FontWeight.Medium
                     )
                 }

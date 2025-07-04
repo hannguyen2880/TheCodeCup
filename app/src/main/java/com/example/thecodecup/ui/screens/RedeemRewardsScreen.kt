@@ -234,6 +234,7 @@ fun RewardItemCard(
                 ) {
                     Text(
                         text = if (canRedeem) "Redeem" else "Not enough",
+                        color = if (canRedeem) Color.White else Color.LightGray,
                         fontSize = 12.sp
                     )
                 }

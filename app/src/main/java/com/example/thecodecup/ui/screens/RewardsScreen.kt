@@ -36,7 +36,8 @@ fun RewardsScreen(
     navController: NavController,
     rewardsViewModel: RewardsViewModel = RewardsViewModel()
 ) {
-    val userPoints by rewardsViewModel.userPoints.collectAsStateWithLifecycle()
+    //val userPoints by rewardsViewModel.userPoints.collectAsStateWithLifecycle()
+    val userPoints = rewardsViewModel.userPoints.collectAsState()
     val pointsHistory by rewardsViewModel.pointsHistory.collectAsStateWithLifecycle()
 
     var selectedTab by remember { mutableStateOf(0) }
@@ -93,7 +94,7 @@ fun RewardsScreen(
                 )
 
                 Text(
-                    text = "$userPoints",
+                    text = "${userPoints.value}",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White

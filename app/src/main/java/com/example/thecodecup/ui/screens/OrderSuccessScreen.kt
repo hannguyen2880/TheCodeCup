@@ -81,13 +81,16 @@ fun OrderSuccessScreen(navController: NavController) {
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF324A59)
+                containerColor = Color(0xFF324A59),
+                contentColor = Color.White
             ),
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
                 "Track My Order",
-                modifier = Modifier.padding(vertical = 4.dp)
+                modifier = Modifier.padding(vertical = 4.dp),
+                color = Color.White,
+                fontWeight = FontWeight.Medium
             )
         }
 
