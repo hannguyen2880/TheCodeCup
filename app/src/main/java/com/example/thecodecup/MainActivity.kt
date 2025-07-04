@@ -3,20 +3,12 @@ package com.example.thecodecup
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,29 +19,33 @@ import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.screens.*
 import com.example.thecodecup.ui.components.BottomNavigationBar
 import com.example.thecodecup.ui.theme.TheCodeCupTheme
+import com.example.thecodecup.ui.theme.ThemeManager
 import com.example.thecodecup.ui.viewmodel.CartViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
-import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TheCodeCupTheme {
-                CoffeeApp()
+            val context = LocalContext.current
+            val themeManager = remember { ThemeManager(context) }
+
+            TheCodeCupTheme(themeManager = themeManager) {
+                CoffeeApp(themeManager)
             }
         }
     }
 }
 
 @Composable
-fun CoffeeApp() {
+fun CoffeeApp(themeManager: ThemeManager) {
     val navController = rememberNavController()
     val cartViewModel: CartViewModel = viewModel()
     val rewardsViewModel: RewardsViewModel = viewModel()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
@@ -116,55 +112,9 @@ fun CoffeeApp() {
                 OrderDetailsScreen(navController, orderId)
             }
 
-            composable(Screen.Rewards.route) {
-                RewardsScreen(navController, rewardsViewModel)
-            }
-
             composable(Screen.RedeemRewards.route) {
                 RedeemRewardsScreen(navController, rewardsViewModel)
             }
-        }
-    }
-}
-
-@Composable
-fun SplashScreen(navController: NavController) {
-    LaunchedEffect(Unit) {
-        delay(3000)
-        navController.navigate(Screen.Home.route) {
-            popUpTo(Screen.Splash.route) { inclusive = true }
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.splash_background),
-            contentDescription = "Splash Background",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.coffee_logo),
-                contentDescription = "Coffee Logo",
-                modifier = Modifier.size(120.dp)
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = "Ordinary Coffee Shop",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
         }
     }
 }
