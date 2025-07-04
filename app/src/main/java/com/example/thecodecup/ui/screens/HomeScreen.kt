@@ -35,6 +35,8 @@ import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.theme.CoffeeBrown
 import com.example.thecodecup.ui.components.ThemeToggleButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,6 +109,7 @@ fun HomeScreen(navController: NavController) {
         item {
             HeaderSection(
                 userName = userProfile.fullName,
+                onSearchClick = { navController.navigate(Screen.Search.route) },
                 onCartClick = { navController.navigate(Screen.MyCart.route) },
                 onProfileClick = { navController.navigate(Screen.Profile.route) }
             )
@@ -135,6 +138,7 @@ fun HomeScreen(navController: NavController) {
 @Composable
 fun HeaderSection(
     userName: String,
+    onSearchClick: () -> Unit,
     onCartClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
@@ -163,6 +167,17 @@ fun HeaderSection(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            IconButton(
+                onClick = onSearchClick,
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
             ThemeToggleButton()
             IconButton(
                 onClick = onCartClick,

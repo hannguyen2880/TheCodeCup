@@ -24,12 +24,12 @@ val SuccessColor = Color(0xFF388E3C)
 val WarningColor = Color(0xFFF57C00)
 
 // Legacy colors for compatibility
-val PrimaryColor = CoffeeBrown
-val SecondaryColor = CoffeeLight
-val OnPrimaryColor = TextOnPrimary
-val OnSecondaryColor = TextPrimary
-val OnBackgroundColor = TextPrimary
-val OnSurfaceColor = TextPrimary
+val PrimaryColor = Color(0xFF8B4513) // Brown color for coffee theme
+val SecondaryColor = Color(0xFFD2691E)
+val OnPrimaryColor = Color(0xFFFFFFFF)
+val OnSecondaryColor = Color(0xFF000000)
+val OnBackgroundColor = Color(0xFF000000)
+val OnSurfaceColor = Color(0xFF000000)
 
 // Additional UI Colors
 val CoffeeWhite = Color(0xFFFFFFFF)

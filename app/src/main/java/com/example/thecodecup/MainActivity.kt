@@ -91,7 +91,9 @@ fun CoffeeApp(themeManager: ThemeManager) {
             composable(Screen.Profile.route) {
                 ProfileScreen(navController)
             }
-
+            composable(Screen.Search.route) {
+                SearchScreen(navController)
+            }
             composable(
                 route = Screen.CoffeeDetails.route,
                 arguments = listOf(navArgument(Screen.CoffeeDetails.COFFEE_ID_ARG) {
