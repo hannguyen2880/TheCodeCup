@@ -73,7 +73,7 @@ fun CoffeeApp(themeManager: ThemeManager) {
             }
 
             composable(Screen.Rewards.route) {
-                RewardsScreen(navController)
+                RewardsScreen(navController, rewardsViewModel)
             }
 
             composable(Screen.MyOrder.route) {

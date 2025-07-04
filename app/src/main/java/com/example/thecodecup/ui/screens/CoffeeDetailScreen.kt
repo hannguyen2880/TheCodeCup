@@ -710,13 +710,3 @@ fun AddToCartSection(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun CoffeeDetailsScreenPreview() {
-    CoffeeDetailsScreen(
-        navController = rememberNavController(),
-        coffeeId = "americano",
-        cartViewModel = CartViewModel()
-    )
-}

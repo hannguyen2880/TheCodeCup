@@ -34,7 +34,7 @@ import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 @Composable
 fun RewardsScreen(
     navController: NavController,
-    rewardsViewModel: RewardsViewModel = RewardsViewModel()
+    rewardsViewModel: RewardsViewModel
 ) {
     //val userPoints by rewardsViewModel.userPoints.collectAsStateWithLifecycle()
     val userPoints = rewardsViewModel.userPoints.collectAsState()
@@ -285,10 +285,4 @@ fun PointsHistoryCard(history: PointsHistory) {
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun RewardsScreenPreview() {
-    RewardsScreen(navController = rememberNavController())
 }
