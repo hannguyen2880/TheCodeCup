@@ -1,4 +1,3 @@
-// ui/screens/ProfileScreen.kt
 package com.example.thecodecup.ui.screens
 
 import androidx.compose.foundation.background

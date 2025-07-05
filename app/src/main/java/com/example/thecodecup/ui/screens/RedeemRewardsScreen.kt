@@ -44,28 +44,28 @@ fun RedeemRewardsScreen(
                 id = "1",
                 coffeeName = "Americano",
                 coffeeImage = R.drawable.americano,
-                pointsRequired = 1340,
+                pointsRequired = 30,
                 validUntil = "Valid until 04.07.23"
             ),
             RewardItem(
                 id = "2",
                 coffeeName = "Cappuccino",
                 coffeeImage = R.drawable.cappuccino,
-                pointsRequired = 1340,
+                pointsRequired = 35,
                 validUntil = "Valid until 04.07.23"
             ),
             RewardItem(
                 id = "3",
                 coffeeName = "Mocha",
                 coffeeImage = R.drawable.mocha,
-                pointsRequired = 1340,
+                pointsRequired = 40,
                 validUntil = "Valid until 04.07.23"
             ),
             RewardItem(
                 id = "4",
                 coffeeName = "Flat White",
                 coffeeImage = R.drawable.flat_white,
-                pointsRequired = 1340,
+                pointsRequired = 35,
                 validUntil = "Valid until 04.07.23"
             )
         )
