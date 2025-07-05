@@ -26,13 +26,17 @@ import androidx.navigation.compose.rememberNavController
 import com.example.thecodecup.R
 import com.example.thecodecup.data.model.RewardItem
 import com.example.thecodecup.ui.theme.CoffeeBrown
+import com.example.thecodecup.ui.viewmodel.CartViewModel
+import com.example.thecodecup.ui.viewmodel.OrdersViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RedeemRewardsScreen(
     navController: NavController,
-    rewardsViewModel: RewardsViewModel
+    cartViewModel: CartViewModel,
+    rewardsViewModel: RewardsViewModel,
+    ordersViewModel: OrdersViewModel
 ) {
     val availableRewards = remember {
         listOf(

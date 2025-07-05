@@ -29,14 +29,19 @@ import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.theme.CoffeeBrown
 import com.example.thecodecup.ui.viewmodel.CartViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
+import com.example.thecodecup.ui.viewmodel.OrdersViewModel
 import kotlin.math.roundToInt
+import com.example.thecodecup.data.model.Order
+import com.example.thecodecup.data.model.OrderStatus
 
+// Update MyCartScreen.kt - Modify the main composable
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyCartScreen(
     navController: NavController,
     cartViewModel: CartViewModel,
-    rewardsViewModel: RewardsViewModel
+    rewardsViewModel: RewardsViewModel,
+    ordersViewModel: OrdersViewModel
 ) {
     val cartItems = cartViewModel.cartItems
     val totalPrice = cartViewModel.getTotalPrice()
@@ -98,7 +103,25 @@ fun MyCartScreen(
             // Checkout Section
             CheckoutSection(
                 totalPrice = totalPrice,
+                cartItems = cartItems,
                 onCheckout = {
+                    // Create order from cart items
+                    val newOrder = Order(
+                        id = System.currentTimeMillis().toString(),
+                        coffeeName = if (cartItems.size == 1) cartItems[0].coffee.name
+                        else "${cartItems[0].coffee.name} + ${cartItems.size - 1} more",
+                        date = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
+                            .format(java.util.Date()),
+                        time = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault())
+                            .format(java.util.Date()),
+                        price = totalPrice,
+                        address = "3 Addersion Court Chino Hills, H064824, United State",
+                        status = OrderStatus.ONGOING
+                    )
+
+                    // Add order to orders list
+                    ordersViewModel.addOrder(newOrder)
+
                     // Clear cart and navigate to success
                     cartViewModel.clearCart()
                     navController.navigate(Screen.OrderSuccess.route)
@@ -342,9 +365,11 @@ fun EmptyCartContent(
     }
 }
 
+
 @Composable
 fun CheckoutSection(
     totalPrice: Double,
+    cartItems: List<CartItem>,
     onCheckout: () -> Unit
 ) {
     Card(

@@ -13,7 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,24 +20,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.thecodecup.R
 import com.example.thecodecup.data.model.PointsHistory
 import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.theme.CoffeeBrown
+import com.example.thecodecup.ui.viewmodel.CartViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
+import com.example.thecodecup.ui.viewmodel.OrdersViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RewardsScreen(
     navController: NavController,
-    rewardsViewModel: RewardsViewModel
+    cartViewModel: CartViewModel,
+    rewardsViewModel: RewardsViewModel,
+    ordersViewModel: OrdersViewModel
 ) {
-    //val userPoints by rewardsViewModel.userPoints.collectAsStateWithLifecycle()
     val userPoints = rewardsViewModel.userPoints.collectAsState()
-    val pointsHistory by rewardsViewModel.pointsHistory.collectAsStateWithLifecycle()
+    val pointsHistory = rewardsViewModel.pointsHistory.collectAsState()
 
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("History", "Redeem")
@@ -211,7 +213,7 @@ fun RewardsScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(vertical = 16.dp)
                 ) {
-                    items(pointsHistory) { history ->
+                    items(pointsHistory.value) { history ->
                         PointsHistoryCard(history = history)
                     }
                 }

@@ -24,66 +24,21 @@ import com.example.thecodecup.data.model.Order
 import com.example.thecodecup.data.model.OrderStatus
 import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.theme.CoffeeBrown
+import com.example.thecodecup.ui.viewmodel.CartViewModel
+import com.example.thecodecup.ui.viewmodel.RewardsViewModel
+import com.example.thecodecup.ui.viewmodel.OrdersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyOrderScreen(navController: NavController) {
-    // Sample orders data with state management
-    var orders by remember {
-        mutableStateOf(
-            listOf(
-                Order(
-                    id = "1",
-                    coffeeName = "Americano",
-                    date = "24 June",
-                    time = "12:30 PM",
-                    price = 3.00,
-                    address = "3 Addersion Court Chino Hills, H064824, United State",
-                    status = OrderStatus.ONGOING
-                ),
-                Order(
-                    id = "2",
-                    coffeeName = "Cafe Latte",
-                    date = "24 June",
-                    time = "11:45 AM",
-                    price = 3.50,
-                    address = "3 Addersion Court Chino Hills, H066824, United State",
-                    status = OrderStatus.ONGOING
-                ),
-                Order(
-                    id = "3",
-                    coffeeName = "Cappuccino",
-                    date = "23 June",
-                    time = "2:15 PM",
-                    price = 3.25,
-                    address = "3 Addersion Court Chino Hills, H066824, United State",
-                    status = OrderStatus.ONGOING
-                ),
-                Order(
-                    id = "4",
-                    coffeeName = "Flat White",
-                    date = "22 June",
-                    time = "10:30 AM",
-                    price = 3.75,
-                    address = "3 Addersion Court Chino Hills, H058824, United State",
-                    status = OrderStatus.COMPLETED
-                ),
-                Order(
-                    id = "5",
-                    coffeeName = "Mocha",
-                    date = "21 June",
-                    time = "3:20 PM",
-                    price = 4.00,
-                    address = "3 Addersion Court Chino Hills, H058824, United State",
-                    status = OrderStatus.COMPLETED
-                )
-            )
-        )
-    }
-
+fun MyOrderScreen(
+    navController: NavController,
+    cartViewModel: CartViewModel,
+    rewardsViewModel: RewardsViewModel,
+    ordersViewModel: OrdersViewModel
+) {
     // Filter orders based on status
-    val ongoingOrders = orders.filter { it.status == OrderStatus.ONGOING }
-    val historyOrders = orders.filter { it.status == OrderStatus.COMPLETED }
+    val ongoingOrders = ordersViewModel.ongoingOrders
+    val historyOrders = ordersViewModel.historyOrders
 
     // Tab state management
     var selectedTab by remember { mutableStateOf(0) }
@@ -193,18 +148,14 @@ fun MyOrderScreen(navController: NavController) {
                     OrderCard(
                         order = order,
                         onOrderClick = { clickedOrder ->
-                            // Navigate to order details
                             navController.navigate(Screen.OrderDetails.createRoute(clickedOrder.id))
                         },
-                        onStatusTransition = { orderToTransition ->
-                            // Transition order from ongoing to completed
-                            if (orderToTransition.status == OrderStatus.ONGOING) {
-                                orders = orders.map {
-                                    if (it.id == orderToTransition.id) {
-                                        it.copy(status = OrderStatus.COMPLETED)
-                                    } else it
-                                }
-                            }
+                        onMarkCompleted = { orderToComplete ->
+                            ordersViewModel.markOrderAsCompleted(orderToComplete.id)
+
+                            // Add bonus points when completed
+                            val bonusPoints = (orderToComplete.price * 0.1).toInt()
+                            rewardsViewModel.addPointsFromCompletedOrder(orderToComplete.id, bonusPoints)
                         }
                     )
                 }
@@ -217,7 +168,7 @@ fun MyOrderScreen(navController: NavController) {
 fun OrderCard(
     order: Order,
     onOrderClick: (Order) -> Unit,
-    onStatusTransition: (Order) -> Unit
+    onMarkCompleted: (Order) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -328,7 +279,7 @@ fun OrderCard(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { onStatusTransition(order) },
+                    onClick = { onMarkCompleted(order) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF324A59)
                     ),
@@ -388,10 +339,4 @@ fun EmptyOrdersState(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MyOrderScreenPreview() {
-    MyOrderScreen(navController = rememberNavController())
 }

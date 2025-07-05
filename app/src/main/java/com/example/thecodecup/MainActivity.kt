@@ -22,6 +22,7 @@ import com.example.thecodecup.ui.theme.TheCodeCupTheme
 import com.example.thecodecup.ui.theme.ThemeManager
 import com.example.thecodecup.ui.viewmodel.CartViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
+import com.example.thecodecup.ui.viewmodel.OrdersViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +43,7 @@ fun CoffeeApp(themeManager: ThemeManager) {
     val navController = rememberNavController()
     val cartViewModel: CartViewModel = viewModel()
     val rewardsViewModel: RewardsViewModel = viewModel()
+    val ordersViewModel: OrdersViewModel = viewModel()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -73,15 +75,15 @@ fun CoffeeApp(themeManager: ThemeManager) {
             }
 
             composable(Screen.Rewards.route) {
-                RewardsScreen(navController, rewardsViewModel)
+                RewardsScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel)
             }
 
             composable(Screen.MyOrder.route) {
-                MyOrderScreen(navController)
+                MyOrderScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel)
             }
 
             composable(Screen.MyCart.route) {
-                MyCartScreen(navController, cartViewModel, rewardsViewModel)
+                MyCartScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel)
             }
 
             composable(Screen.OrderSuccess.route) {
@@ -115,7 +117,7 @@ fun CoffeeApp(themeManager: ThemeManager) {
             }
 
             composable(Screen.RedeemRewards.route) {
-                RedeemRewardsScreen(navController, rewardsViewModel)
+                RedeemRewardsScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel)
             }
         }
     }
