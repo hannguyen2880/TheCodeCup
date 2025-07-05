@@ -62,13 +62,6 @@ class OrdersViewModel : ViewModel() {
     val historyOrders: List<Order>
         get() = _orders.filter { it.status == OrderStatus.COMPLETED }
 
-    fun markOrderAsCompleted(orderId: String) {
-        val index = _orders.indexOfFirst { it.id == orderId }
-        if (index != -1) {
-            _orders[index] = _orders[index].copy(status = OrderStatus.COMPLETED)
-        }
-    }
-
     fun updateOrderStatus(orderId: String, newStatus: OrderStatus) {
         val index = _orders.indexOfFirst { it.id == orderId }
         if (index != -1) {
@@ -77,5 +70,12 @@ class OrdersViewModel : ViewModel() {
     }
     fun addOrder(order: Order) {
         _orders.add(0, order)
+    }
+
+    fun markOrderAsCompleted(orderId: String) {
+        val index = _orders.indexOfFirst { it.id == orderId }
+        if (index != -1) {
+            _orders[index] = _orders[index].copy(status = OrderStatus.COMPLETED)
+        }
     }
 }

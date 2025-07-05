@@ -52,4 +52,23 @@ class UserPreferencesRepository(context: Context) {
         val currentProfile = _userProfile.value
         updateUserProfile(currentProfile.copy(profileImageUri = uri))
     }
+
+    fun getLoyaltyStamps(): Int {
+        return prefs.getInt("loyalty_stamps", 0)
+    }
+
+    fun updateLoyaltyStamps(stamps: Int) {
+        prefs.edit().putInt("loyalty_stamps", stamps).apply()
+    }
+
+    fun resetLoyaltyStamps() {
+        prefs.edit().putInt("loyalty_stamps", 0).apply()
+    }
+
+    fun addLoyaltyStamp() {
+        val currentStamps = getLoyaltyStamps()
+        if (currentStamps < 8) {
+            updateLoyaltyStamps(currentStamps + 1)
+        }
+    }
 }

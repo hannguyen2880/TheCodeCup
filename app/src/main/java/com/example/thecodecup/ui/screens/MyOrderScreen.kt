@@ -27,6 +27,7 @@ import com.example.thecodecup.ui.theme.CoffeeBrown
 import com.example.thecodecup.ui.viewmodel.CartViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 import com.example.thecodecup.ui.viewmodel.OrdersViewModel
+import com.example.thecodecup.ui.viewmodel.LoyaltyViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,7 +35,8 @@ fun MyOrderScreen(
     navController: NavController,
     cartViewModel: CartViewModel,
     rewardsViewModel: RewardsViewModel,
-    ordersViewModel: OrdersViewModel
+    ordersViewModel: OrdersViewModel,
+    loyaltyViewModel: LoyaltyViewModel
 ) {
     // Filter orders based on status
     val ongoingOrders = ordersViewModel.ongoingOrders
@@ -156,6 +158,7 @@ fun MyOrderScreen(
                             // Add bonus points when completed
                             val bonusPoints = (orderToComplete.price * 0.1).toInt()
                             rewardsViewModel.addPointsFromCompletedOrder(orderToComplete.id, bonusPoints)
+                            loyaltyViewModel.addStampFromCompletedOrder()
                         }
                     )
                 }

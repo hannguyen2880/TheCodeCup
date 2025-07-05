@@ -58,7 +58,11 @@ class CartViewModel : ViewModel() {
         return _cartItems.sumOf { it.quantity }
     }
     // Add this method to your CartViewModel class
-    fun createOrderFromCart(ordersViewModel: OrdersViewModel, rewardsViewModel: RewardsViewModel) {
+    fun createOrderFromCart(
+        ordersViewModel: OrdersViewModel,
+        rewardsViewModel: RewardsViewModel,
+        loyaltyViewModel: LoyaltyViewModel? = null
+    ) {
         if (cartItems.isNotEmpty()) {
             val totalAmount = getTotalPrice()
             val orderItems = cartItems.map { cartItem ->
@@ -87,6 +91,11 @@ class CartViewModel : ViewModel() {
             // Add points for the order (10 points per dollar spent)
             val pointsEarned = (totalAmount * 10).toInt()
             rewardsViewModel.addPoints(pointsEarned)
+
+            // Add stamp when order is created
+            loyaltyViewModel?.addStampFromCompletedOrder()
+
+            clearCart()
         }
     }
 }

@@ -37,13 +37,20 @@ import com.example.thecodecup.ui.components.ThemeToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import com.example.thecodecup.ui.viewmodel.LoyaltyViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    navController: NavController,
+    loyaltyViewModel: LoyaltyViewModel,
+) {
     val context = LocalContext.current
     val userRepository = remember { UserPreferencesRepository(context) }
     val userProfile by userRepository.userProfile.collectAsStateWithLifecycle()
+
+    // Get actual loyalty stamps from ViewModel
+    val currentStamps by loyaltyViewModel.loyaltyStamps
 
     // Coffee data with model classes
     val coffeeList = remember {
@@ -93,11 +100,6 @@ fun HomeScreen(navController: NavController) {
         )
     }
 
-    // Loyalty card with model
-    val loyaltyCard = remember {
-        LoyaltyCard(currentStamps = 4, maxStamps = 8, totalPoints = 120)
-    }
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -115,10 +117,11 @@ fun HomeScreen(navController: NavController) {
             )
         }
 
-        // Loyalty Card Section
+        // Loyalty Card Section - Use actual stamps
         item {
             LoyaltyCardSection(
-                loyaltyCard = loyaltyCard,
+                currentStamps = currentStamps,
+                maxStamps = loyaltyViewModel.maxStamps,
                 onCardClick = { navController.navigate(Screen.Rewards.route) }
             )
         }
@@ -131,6 +134,71 @@ fun HomeScreen(navController: NavController) {
                     navController.navigate(Screen.CoffeeDetails.createRoute(coffee.id))
                 }
             )
+        }
+    }
+}
+
+@Composable
+fun LoyaltyCardSection(
+    currentStamps: Int,
+    maxStamps: Int,
+    onCardClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCardClick() },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF4A5568) // Dark blue-gray from design
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            // Card Header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Loyalty card",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White
+                )
+                Text(
+                    text = "$currentStamps/$maxStamps",
+                    fontSize = 14.sp,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Coffee Cup Stamps Progress
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(maxStamps) { index ->
+                        CoffeeStampIcon(
+                            isActive = index < currentStamps,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -390,10 +458,4 @@ fun CoffeeCard(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen(navController = rememberNavController())
 }

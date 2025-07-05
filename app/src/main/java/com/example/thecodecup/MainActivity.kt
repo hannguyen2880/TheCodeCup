@@ -23,7 +23,7 @@ import com.example.thecodecup.ui.theme.ThemeManager
 import com.example.thecodecup.ui.viewmodel.CartViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 import com.example.thecodecup.ui.viewmodel.OrdersViewModel
-
+import com.example.thecodecup.ui.viewmodel.LoyaltyViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +44,7 @@ fun CoffeeApp(themeManager: ThemeManager) {
     val cartViewModel: CartViewModel = viewModel()
     val rewardsViewModel: RewardsViewModel = viewModel()
     val ordersViewModel: OrdersViewModel = viewModel()
-
+    val loyaltyViewModel: LoyaltyViewModel = viewModel()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
@@ -71,15 +71,15 @@ fun CoffeeApp(themeManager: ThemeManager) {
             }
 
             composable(Screen.Home.route) {
-                HomeScreen(navController)
+                HomeScreen(navController, loyaltyViewModel)
             }
 
             composable(Screen.Rewards.route) {
-                RewardsScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel)
+                RewardsScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel, loyaltyViewModel)
             }
 
             composable(Screen.MyOrder.route) {
-                MyOrderScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel)
+                MyOrderScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel, loyaltyViewModel)
             }
 
             composable(Screen.MyCart.route) {
