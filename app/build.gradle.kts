@@ -74,6 +74,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     //
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
+    // avatar
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("androidx.activity:activity-compose:1.8.2")
     // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

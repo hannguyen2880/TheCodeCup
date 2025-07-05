@@ -19,7 +19,8 @@ class UserPreferencesRepository(context: Context) {
             phoneNumber = prefs.getString("phone_number", "+60134589525") ?: "+60134589525",
             email = prefs.getString("email", "Anderson@email.com") ?: "Anderson@email.com",
             address = prefs.getString("address", "3 Addersion Court\nChino Hills, HO56824, United State")
-                ?: "3 Addersion Court\nChino Hills, HO56824, United State"
+                ?: "3 Addersion Court\nChino Hills, HO56824, United State",
+            profileImageUri = prefs.getString("profile_image_uri", null)
         )
     }
 
@@ -29,6 +30,7 @@ class UserPreferencesRepository(context: Context) {
             putString("phone_number", profile.phoneNumber)
             putString("email", profile.email)
             putString("address", profile.address)
+            putString("profile_image_uri", profile.profileImageUri)
             apply()
         }
         _userProfile.value = profile
@@ -44,5 +46,10 @@ class UserPreferencesRepository(context: Context) {
             else -> currentProfile
         }
         updateUserProfile(updatedProfile)
+    }
+
+    fun updateProfileImage(uri: String) {
+        val currentProfile = _userProfile.value
+        updateUserProfile(currentProfile.copy(profileImageUri = uri))
     }
 }
