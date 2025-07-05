@@ -33,6 +33,10 @@ import com.example.thecodecup.data.model.LoyaltyCard
 import com.example.thecodecup.data.repository.UserPreferencesRepository
 import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.theme.CoffeeBrown
+import com.example.thecodecup.ui.components.ThemeToggleButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +101,7 @@ fun HomeScreen(navController: NavController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5)),
+            .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -105,6 +109,7 @@ fun HomeScreen(navController: NavController) {
         item {
             HeaderSection(
                 userName = userProfile.fullName,
+                onSearchClick = { navController.navigate(Screen.Search.route) },
                 onCartClick = { navController.navigate(Screen.MyCart.route) },
                 onProfileClick = { navController.navigate(Screen.Profile.route) }
             )
@@ -133,6 +138,7 @@ fun HomeScreen(navController: NavController) {
 @Composable
 fun HeaderSection(
     userName: String,
+    onSearchClick: () -> Unit,
     onCartClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
@@ -146,14 +152,14 @@ fun HeaderSection(
             Text(
                 text = "Good morning",
                 fontSize = 14.sp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Normal
             )
             Text(
                 text = userName,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -162,13 +168,25 @@ fun HeaderSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             IconButton(
+                onClick = onSearchClick,
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            ThemeToggleButton()
+            IconButton(
                 onClick = onCartClick,
                 modifier = Modifier.size(40.dp)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_cart),
                     contentDescription = "My Cart",
-                    tint = Color.Black,
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -180,7 +198,7 @@ fun HeaderSection(
                 Icon(
                     painter = painterResource(R.drawable.ic_profile_),
                     contentDescription = "Profile",
-                    tint = Color.Black,
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(24.dp)
                 )
             }

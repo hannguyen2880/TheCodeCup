@@ -22,8 +22,8 @@ fun BottomNavigationBar(navController: NavHostController) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar(
-        containerColor = Color.White,
-        contentColor = CoffeeBrown
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.primary
     ) {
         items.forEach { item ->
             NavigationBarItem(
@@ -36,7 +36,9 @@ fun BottomNavigationBar(navController: NavHostController) {
                 label = {
                     Text(
                         text = item.title,
-                        color = if (currentRoute == item.route) CoffeeBrown else Color.Gray
+                        color = if (currentRoute == item.route)
+                            MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
                 selected = currentRoute == item.route,
@@ -47,9 +49,9 @@ fun BottomNavigationBar(navController: NavHostController) {
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = CoffeeBrown,
-                    unselectedIconColor = Color.Gray,
-                    indicatorColor = CoffeeBrown.copy(alpha = 0.1f)
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                 )
             )
         }

@@ -59,6 +59,24 @@ class CoffeeRepositoryImpl : CoffeeRepository {
     override fun getPopularCoffees(): Flow<List<Coffee>> =
         flowOf(coffeeList.filter { it.isPopular })
 
-    override fun searchCoffees(query: String): Flow<List<Coffee>> =
-        flowOf(coffeeList.filter { it.name.contains(query, ignoreCase = true) })
+    //override fun searchCoffees(query: String): Flow<List<Coffee>> =
+    //    flowOf(coffeeList.filter { it.name.contains(query, ignoreCase = true) })
+
+    // Add this method to your existing CoffeeRepositoryImpl class
+    override fun searchCoffees(query: String): Flow<List<Coffee>> {
+        return flowOf(
+            coffeeList.filter { coffee ->
+                coffee.name.contains(query, ignoreCase = true) ||
+                        coffee.description.contains(query, ignoreCase = true) ||
+                        coffee.category.contains(query, ignoreCase = true) ||
+                        coffee.ingredients.any { ingredient ->
+                            ingredient.contains(query, ignoreCase = true)
+                        }
+            }.sortedWith(
+                compareByDescending<Coffee> { it.isPopular }
+                    .thenByDescending { it.rating }
+                    .thenBy { it.name }
+            )
+        )
+    }
 }

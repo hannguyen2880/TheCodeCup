@@ -1,11 +1,13 @@
 package com.example.thecodecup.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,322 +21,228 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.thecodecup.R
+import com.example.thecodecup.data.model.RewardItem
 import com.example.thecodecup.ui.theme.CoffeeBrown
-import com.example.thecodecup.ui.viewmodel.RewardItem
+import com.example.thecodecup.ui.viewmodel.CartViewModel
+import com.example.thecodecup.ui.viewmodel.OrdersViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RedeemRewardsScreen(
     navController: NavController,
-    viewModel: RewardsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    cartViewModel: CartViewModel,
+    rewardsViewModel: RewardsViewModel,
+    ordersViewModel: OrdersViewModel
 ) {
-    val currentPoints by viewModel.currentPoints.collectAsStateWithLifecycle()
-    var showSuccess by remember { mutableStateOf(false) }
-    var isRedeeming by remember { mutableStateOf(false) }
-
-    // Sample reward for demonstration
-    val selectedReward = remember {
-        RewardItem(
-            id = "free_coffee",
-            title = "Free Coffee",
-            description = "Any size, any drink of your choice",
-            pointsCost = 100,
-            imageRes = R.drawable.americano
+    val availableRewards = remember {
+        listOf(
+            RewardItem(
+                id = "1",
+                coffeeName = "Americano",
+                coffeeImage = R.drawable.americano,
+                pointsRequired = 1340,
+                validUntil = "Valid until 04.07.23"
+            ),
+            RewardItem(
+                id = "2",
+                coffeeName = "Cappuccino",
+                coffeeImage = R.drawable.cappuccino,
+                pointsRequired = 1340,
+                validUntil = "Valid until 04.07.23"
+            ),
+            RewardItem(
+                id = "3",
+                coffeeName = "Mocha",
+                coffeeImage = R.drawable.mocha,
+                pointsRequired = 1340,
+                validUntil = "Valid until 04.07.23"
+            ),
+            RewardItem(
+                id = "4",
+                coffeeName = "Flat White",
+                coffeeImage = R.drawable.flat_white,
+                pointsRequired = 1340,
+                validUntil = "Valid until 04.07.23"
+            )
         )
     }
 
-    if (showSuccess) {
-        RedeemSuccessScreen(
-            reward = selectedReward,
-            onContinue = { navController.popBackStack() }
-        )
-    } else {
-        Scaffold(
-            containerColor = Color.White,
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            text = "Redeem Reward",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Back",
-                                tint = Color.Black
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color.White
-                    )
-                )
-            }
-        ) { padding ->
-            Column(
-                modifier = Modifier
-                    .padding(padding)
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
-                // Current Points Display
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFF8F9FA)
-                    ),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Your Points",
-                            fontSize = 16.sp,
-                            color = Color.Gray
-                        )
-                        Text(
-                            text = currentPoints.toString(),
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = CoffeeBrown
-                        )
-                    }
-                }
+    val userPoints = rewardsViewModel.userPoints.collectAsState()
 
-                // Reward Details Card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        // Reward Image
-                        Image(
-                            painter = painterResource(selectedReward.imageRes),
-                            contentDescription = selectedReward.title,
-                            modifier = Modifier
-                                .size(120.dp)
-                                .clip(RoundedCornerShape(16.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-
-                        // Reward Title
-                        Text(
-                            text = selectedReward.title,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black,
-                            textAlign = TextAlign.Center
-                        )
-
-                        // Reward Description
-                        Text(
-                            text = selectedReward.description,
-                            fontSize = 16.sp,
-                            color = Color.Gray,
-                            textAlign = TextAlign.Center
-                        )
-
-                        // Points Cost
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = CoffeeBrown.copy(alpha = 0.1f)
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(
-                                text = "${selectedReward.pointsCost} Points",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = CoffeeBrown,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                // Redeem Button
-                Button(
-                    onClick = {
-                        isRedeeming = true
-                    },
-                    enabled = currentPoints >= selectedReward.pointsCost && !isRedeeming,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = CoffeeBrown,
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                ) {
-                    if (isRedeeming) {
-                        CircularProgressIndicator(
-                            color = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    } else {
-                        Text(
-                            text = if (currentPoints >= selectedReward.pointsCost)
-                                "Redeem Now"
-                            else
-                                "Insufficient Points",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.White
-                        )
-                    }
-                }
-
-                // Process redemption
-                LaunchedEffect(isRedeeming) {
-                    if (isRedeeming) {
-                        delay(2000) // Simulate processing
-                        val success = viewModel.redeemReward(selectedReward)
-                        if (success) {
-                            showSuccess = true
-                        }
-                        isRedeeming = false
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun RedeemSuccessScreen(
-    reward: RewardItem,
-    onContinue: () -> Unit
-) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .background(Color.White)
     ) {
-        // Success Icon
-        Icon(
-            imageVector = Icons.Default.CheckCircle,
-            contentDescription = "Success",
-            tint = Color(0xFF4CAF50),
-            modifier = Modifier.size(80.dp)
+        // Header
+        TopAppBar(
+            title = {
+                Text(
+                    text = "Redeem",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = { navController.navigateUp() }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.White
+            )
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Success Message
-        Text(
-            text = "Reward Redeemed!",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = "Your ${reward.title} has been successfully redeemed. Show this screen to the barista.",
-            fontSize = 16.sp,
-            color = Color.Gray,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Reward Details
+        // Points Balance
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFF8F9FA)
+                containerColor = CoffeeBrown
             ),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(reward.imageRes),
-                    contentDescription = reward.title,
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
                 Text(
-                    text = reward.title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-
-                Text(
-                    text = reward.description,
+                    text = "Your Points",
                     fontSize = 14.sp,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center
+                    color = Color.White.copy(alpha = 0.8f)
+                )
+                Text(
+                    text = "${userPoints.value}",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        // Available Rewards
+        Text(
+            text = "Available Rewards",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
 
-        // Continue Button
-        Button(
-            onClick = onContinue,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = CoffeeBrown
-            ),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth()
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(vertical = 8.dp)
         ) {
-            Text(
-                text = "Continue",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.White
-            )
+            items(availableRewards) { reward ->
+                RewardItemCard(
+                    reward = reward,
+                    userPoints = userPoints.value,
+                    onRedeemClick = { rewardItem ->
+                        if (userPoints.value >= rewardItem.pointsRequired) {
+                            rewardsViewModel.redeemReward(rewardItem)
+                            navController.navigateUp()
+                        }
+                    }
+                )
+            }
         }
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun RedeemRewardsScreenPreview() {
-    RedeemRewardsScreen(navController = rememberNavController())
+fun RewardItemCard(
+    reward: RewardItem,
+    userPoints: Int,
+    onRedeemClick: (RewardItem) -> Unit
+) {
+    val canRedeem = userPoints >= reward.pointsRequired
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Coffee Image and Info
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(reward.coffeeImage),
+                    contentDescription = reward.coffeeName,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column {
+                    Text(
+                        text = reward.coffeeName,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Text(
+                        text = reward.validUntil,
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
+
+            // Points and Redeem Button
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = "${reward.pointsRequired} pts",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = CoffeeBrown
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    onClick = { onRedeemClick(reward) },
+                    enabled = canRedeem,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (canRedeem) CoffeeBrown else Color.Gray,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = if (canRedeem) "Redeem" else "Not enough",
+                        color = if (canRedeem) Color.White else Color.LightGray,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+        }
+    }
 }

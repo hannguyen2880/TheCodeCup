@@ -11,7 +11,6 @@ sealed class Screen(val route: String) {
     object Profile : Screen(route = "profile_screen")
     object Rewards : Screen(route = "rewards_screen")
     object MyOrder : Screen(route = "myorder_screen")
-
     // Detail Screens with Parameters
     object CoffeeDetails : Screen("coffee_details/{coffee_id}") {
         fun createRoute(coffeeId: String) = "coffee_details/$coffeeId"
@@ -28,7 +27,7 @@ sealed class Screen(val route: String) {
     object RedeemRewards : Screen(route = "redeem_rewards_screen")
 
     // Additional Screens
-    object Search : Screen("search_screen")
+    object Search : Screen(route = "search")
     object Notifications : Screen("notifications_screen")
     object Settings : Screen("settings_screen")
     object EditProfile : Screen("edit_profile_screen")
