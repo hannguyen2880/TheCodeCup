@@ -77,6 +77,8 @@ dependencies {
     // avatar
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("androidx.activity:activity-compose:1.8.2")
+    //
+    implementation("com.google.code.gson:gson:2.10.1")
     // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
