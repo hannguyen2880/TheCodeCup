@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class RewardsViewModel : ViewModel() {
-    private val _userPoints = MutableStateFlow(2040)
+    private val _userPoints = MutableStateFlow(100) // Initial points
     val userPoints: StateFlow<Int> = _userPoints.asStateFlow()
 
     private val _pointsHistoryList = mutableStateListOf(

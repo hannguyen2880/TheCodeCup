@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -30,6 +31,7 @@ import com.example.thecodecup.ui.viewmodel.CartViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 import com.example.thecodecup.ui.viewmodel.OrdersViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.thecodecup.ui.viewmodel.LoyaltyViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,10 +39,15 @@ fun RewardsScreen(
     navController: NavController,
     cartViewModel: CartViewModel,
     rewardsViewModel: RewardsViewModel,
-    ordersViewModel: OrdersViewModel
+    ordersViewModel: OrdersViewModel,
+    loyaltyViewModel: LoyaltyViewModel,
 ) {
+    val currentStamps by loyaltyViewModel.loyaltyStamps
+    val maxStamps = loyaltyViewModel.maxStamps
     val userPoints = rewardsViewModel.userPoints.collectAsState()
     val pointsHistory = rewardsViewModel.pointsHistory.collectAsState()
+
+    val cupsToGo = maxStamps - currentStamps
 
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("History", "Redeem")
@@ -104,7 +111,7 @@ fun RewardsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Coffee Cup Progress (4/8)
+                // Coffee Cup Progress
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -122,14 +129,15 @@ fun RewardsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "4 / 8",
+                                text = "$currentStamps / $maxStamps",
                                 fontSize = 12.sp,
                                 color = Color.Gray
                             )
                             Text(
-                                text = "4 cups to go",
+                                text = if (cupsToGo > 0) "$cupsToGo cups to go" else "Card Complete!",
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = if (cupsToGo > 0) Color.Gray else CoffeeBrown,
+                                fontWeight = if (cupsToGo == 0) FontWeight.Bold else FontWeight.Normal
                             )
                         }
 
@@ -139,12 +147,12 @@ fun RewardsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            repeat(8) { index ->
+                            repeat(maxStamps) { index ->
                                 Box(
                                     modifier = Modifier
                                         .size(24.dp)
                                         .background(
-                                            color = if (index < 4) Color.White else Color.White.copy(alpha = 0.3f),
+                                            color = if (index < currentStamps) Color.White else Color.White.copy(alpha = 0.3f),
                                             shape = CircleShape
                                         ),
                                     contentAlignment = Alignment.Center
@@ -152,10 +160,33 @@ fun RewardsScreen(
                                     Icon(
                                         painter = painterResource(R.drawable.ic_coffee_cup),
                                         contentDescription = "Coffee Cup",
-                                        tint = if (index < 4) CoffeeBrown else Color.Gray.copy(alpha = 0.5f),
+                                        tint = if (index < currentStamps) CoffeeBrown else Color.Gray.copy(alpha = 0.5f),
                                         modifier = Modifier.size(16.dp)
                                     )
                                 }
+                            }
+                        }
+
+                        if (currentStamps >= maxStamps) {
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Button(
+                                onClick = {
+                                    loyaltyViewModel.redeemFreeCard()
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.White
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text(
+                                    text = "Redeem Free Coffee",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF4CAF50),
+                                    modifier = Modifier.padding(vertical = 4.dp)
+                                )
                             }
                         }
                     }

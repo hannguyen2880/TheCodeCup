@@ -13,7 +13,8 @@ data class LoyaltyCard(
     val currentStamps: Int = 0,
     val maxStamps: Int = 8,
     val totalPoints: Int = 0,
-    val membershipLevel: MembershipLevel = MembershipLevel.BRONZE
+    val membershipLevel: MembershipLevel = MembershipLevel.BRONZE,
+    val isComplete: Boolean = false
 )
 
 enum class MembershipLevel(val displayName: String, val benefits: String) {

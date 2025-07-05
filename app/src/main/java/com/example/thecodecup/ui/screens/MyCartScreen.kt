@@ -2,7 +2,6 @@ package com.example.thecodecup.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,28 +12,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.thecodecup.data.model.CartItem
+import com.example.thecodecup.data.model.Order
+import com.example.thecodecup.data.model.OrderStatus
 import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.theme.CoffeeBrown
 import com.example.thecodecup.ui.viewmodel.CartViewModel
-import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 import com.example.thecodecup.ui.viewmodel.OrdersViewModel
-import kotlin.math.roundToInt
-import com.example.thecodecup.data.model.Order
-import com.example.thecodecup.data.model.OrderStatus
+import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 
-// Update MyCartScreen.kt - Modify the main composable
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyCartScreen(
@@ -43,7 +37,7 @@ fun MyCartScreen(
     rewardsViewModel: RewardsViewModel,
     ordersViewModel: OrdersViewModel
 ) {
-    val cartItems = cartViewModel.cartItems
+    val cartItems by cartViewModel.cartItems.collectAsState()
     val totalPrice = cartViewModel.getTotalPrice()
 
     Column(
@@ -103,7 +97,6 @@ fun MyCartScreen(
             // Checkout Section
             CheckoutSection(
                 totalPrice = totalPrice,
-                cartItems = cartItems,
                 onCheckout = {
                     // Create order from cart items
                     val newOrder = Order(
@@ -365,11 +358,9 @@ fun EmptyCartContent(
     }
 }
 
-
 @Composable
 fun CheckoutSection(
     totalPrice: Double,
-    cartItems: List<CartItem>,
     onCheckout: () -> Unit
 ) {
     Card(

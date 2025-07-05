@@ -8,16 +8,21 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.thecodecup.data.model.Order
@@ -27,6 +32,9 @@ import com.example.thecodecup.ui.theme.CoffeeBrown
 import com.example.thecodecup.ui.viewmodel.CartViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 import com.example.thecodecup.ui.viewmodel.OrdersViewModel
+import com.example.thecodecup.ui.viewmodel.LoyaltyViewModel
+import com.example.thecodecup.data.repository.UserPreferencesRepository
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,43 +42,29 @@ fun MyOrderScreen(
     navController: NavController,
     cartViewModel: CartViewModel,
     rewardsViewModel: RewardsViewModel,
-    ordersViewModel: OrdersViewModel
+    ordersViewModel: OrdersViewModel,
+    loyaltyViewModel: LoyaltyViewModel
 ) {
-    // Filter orders based on status
-    val ongoingOrders = ordersViewModel.ongoingOrders
-    val historyOrders = ordersViewModel.historyOrders
+    val ongoingOrders by ordersViewModel.ongoingOrders.collectAsState()
+    val historyOrders by ordersViewModel.historyOrders.collectAsState()
 
-    // Tab state management
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("On going", "History")
+    val tabs = listOf("Ongoing", "History")
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Custom Header with Navigation
+        // Header
         TopAppBar(
             title = {
-                Box(Modifier.fillMaxWidth()) {
-                    Card(
-                        modifier = Modifier.align(Alignment.Center),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF324A59).copy(alpha = 0.1f)
-                        ),
-                        shape = RoundedCornerShape(20.dp)
-                    ) {
-                        Text(
-                            text = "My Order",
-                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF324A59)
-                            )
-                        )
-                    }
-                }
+                Text(
+                    text = "My Orders",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
             },
             navigationIcon = {
                 IconButton(onClick = { navController.navigateUp() }) {
@@ -86,18 +80,18 @@ fun MyOrderScreen(
             )
         )
 
-        // Custom Tab Row
+        // Tab Row
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
-            shape = RoundedCornerShape(16.dp)
+                .padding(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+            shape = RoundedCornerShape(12.dp)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(4.dp)
             ) {
                 tabs.forEachIndexed { index, title ->
                     Card(
@@ -106,9 +100,9 @@ fun MyOrderScreen(
                             .clickable { selectedTab = index },
                         colors = CardDefaults.cardColors(
                             containerColor = if (selectedTab == index)
-                                Color(0xFF324A59) else Color.Transparent
+                                CoffeeBrown else Color.Transparent
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
                             text = title,
@@ -117,7 +111,7 @@ fun MyOrderScreen(
                                 .padding(vertical = 12.dp),
                             textAlign = TextAlign.Center,
                             fontSize = 16.sp,
-                            fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Medium,
+                            fontWeight = FontWeight.Medium,
                             color = if (selectedTab == index) Color.White else Color.Gray
                         )
                     }
@@ -131,7 +125,12 @@ fun MyOrderScreen(
         if (currentOrders.isEmpty()) {
             EmptyOrdersState(
                 isOngoing = selectedTab == 0,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onStartShopping = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                }
             )
         } else {
             LazyColumn(
@@ -139,7 +138,7 @@ fun MyOrderScreen(
                     .weight(1f)
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(vertical = 16.dp)
+                contentPadding = PaddingValues(vertical = 8.dp)
             ) {
                 items(
                     items = currentOrders,
@@ -147,15 +146,21 @@ fun MyOrderScreen(
                 ) { order ->
                     OrderCard(
                         order = order,
+                        isOngoing = selectedTab == 0,
                         onOrderClick = { clickedOrder ->
                             navController.navigate(Screen.OrderDetails.createRoute(clickedOrder.id))
                         },
                         onMarkCompleted = { orderToComplete ->
                             ordersViewModel.markOrderAsCompleted(orderToComplete.id)
 
-                            // Add bonus points when completed
+                            // Add loyalty rewards
                             val bonusPoints = (orderToComplete.price * 0.1).toInt()
                             rewardsViewModel.addPointsFromCompletedOrder(orderToComplete.id, bonusPoints)
+                            loyaltyViewModel.addStampFromCompletedOrder()
+                        },
+                        onReorder = { orderToReorder ->
+                            // Navigate back to home or show reorder confirmation
+                            navController.navigate(Screen.Home.route)
                         }
                     )
                 }
@@ -167,75 +172,56 @@ fun MyOrderScreen(
 @Composable
 fun OrderCard(
     order: Order,
+    isOngoing: Boolean,
     onOrderClick: (Order) -> Unit,
-    onMarkCompleted: (Order) -> Unit
+    onMarkCompleted: (Order) -> Unit,
+    onReorder: (Order) -> Unit
 ) {
+    val context = LocalContext.current
+    val userRepository = remember { UserPreferencesRepository(context) }
+    val userProfile by userRepository.userProfile.collectAsStateWithLifecycle()
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onOrderClick(order) },
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(16.dp)
         ) {
-            // Header Row: Date/Time and Price
+            // Header Row - Order ID and Date
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
-                Text(
-                    text = "${order.date} | ${order.time}",
-                    fontSize = 14.sp,
-                    color = Color.Gray,
-                    fontWeight = FontWeight.Medium
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Receipt,
+                            contentDescription = null,
+                            tint = Color.Gray,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Order #${order.id.takeLast(6)}",
+                            fontSize = 12.sp,
+                            color = Color.Gray,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
 
-                Text(
-                    text = "$${String.format("%.2f", order.price)}",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF324A59)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Coffee Name with Status Indicator
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Status Dot
-                    Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .background(
-                                color = when (order.status) {
-                                    OrderStatus.ONGOING -> Color(0xFF4CAF50)
-                                    OrderStatus.COMPLETED -> Color.Gray
-                                    else -> CoffeeBrown
-                                },
-                                shape = RoundedCornerShape(6.dp)
-                            )
-                    )
-
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = order.coffeeName,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        text = "${order.date} | ${order.time}",
+                        fontSize = 12.sp,
+                        color = Color.Gray
                     )
                 }
 
@@ -244,52 +230,96 @@ fun OrderCard(
                     colors = CardDefaults.cardColors(
                         containerColor = when (order.status) {
                             OrderStatus.ONGOING -> Color(0xFF4CAF50).copy(alpha = 0.1f)
-                            OrderStatus.COMPLETED -> Color.Gray.copy(alpha = 0.1f)
+                            OrderStatus.COMPLETED -> Color(0xFF2196F3).copy(alpha = 0.1f)
                             else -> CoffeeBrown.copy(alpha = 0.1f)
                         }
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
                         text = order.status.displayName,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        fontSize = 12.sp,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                         color = when (order.status) {
                             OrderStatus.ONGOING -> Color(0xFF4CAF50)
-                            OrderStatus.COMPLETED -> Color.Gray
+                            OrderStatus.COMPLETED -> Color(0xFF2196F3)
                             else -> CoffeeBrown
                         }
                     )
                 }
             }
 
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Coffee Name and Price
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = order.coffeeName,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = "$${String.format("%.2f", order.price)}",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = CoffeeBrown
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Address
+            // Info
             Text(
-                text = order.address,
-                fontSize = 14.sp,
+                text = "Ordered by: ${userProfile.fullName}",
+                fontSize = 13.sp,
                 color = Color.Gray,
-                modifier = Modifier.padding(start = 24.dp)
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
 
-            // Action Button (only for ongoing orders)
-            if (order.status == OrderStatus.ONGOING) {
+            // Action Buttons
+            if (isOngoing && order.status == OrderStatus.ONGOING) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
                     onClick = { onMarkCompleted(order) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF324A59)
+                        containerColor = Color(0xFF4CAF50)
                     ),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "Mark as Completed",
                         fontSize = 14.sp,
                         color = Color.White,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            } else if (!isOngoing && order.status == OrderStatus.COMPLETED) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedButton(
+                    onClick = { onReorder(order) },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = CoffeeBrown
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Reorder",
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -301,7 +331,8 @@ fun OrderCard(
 @Composable
 fun EmptyOrdersState(
     isOngoing: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onStartShopping: () -> Unit
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
@@ -312,7 +343,7 @@ fun EmptyOrdersState(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "📋",
+                text = if (isOngoing) "📋" else "📝",
                 fontSize = 64.sp
             )
 
@@ -330,13 +361,31 @@ fun EmptyOrdersState(
 
             Text(
                 text = if (isOngoing)
-                    "Your current orders will appear here"
+                    "Your active orders will appear here"
                 else
                     "Your completed orders will appear here",
                 fontSize = 14.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center
             )
+
+            if (isOngoing) {
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = onStartShopping,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = CoffeeBrown
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "Start Shopping",
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
         }
     }
 }

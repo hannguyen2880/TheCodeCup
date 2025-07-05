@@ -15,6 +15,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.thecodecup.data.repository.CartRepository
+import com.example.thecodecup.data.repository.LoyaltyRepository
+import com.example.thecodecup.data.repository.OrdersRepository
+import com.example.thecodecup.data.repository.RewardsRepository
+import com.example.thecodecup.data.repository.UserPreferencesRepository
 import com.example.thecodecup.navigation.Screen
 import com.example.thecodecup.ui.screens.*
 import com.example.thecodecup.ui.components.BottomNavigationBar
@@ -23,27 +28,51 @@ import com.example.thecodecup.ui.theme.ThemeManager
 import com.example.thecodecup.ui.viewmodel.CartViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 import com.example.thecodecup.ui.viewmodel.OrdersViewModel
+import com.example.thecodecup.ui.viewmodel.LoyaltyViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize repositories
+        val userPreferencesRepository = UserPreferencesRepository(this)
+        val ordersRepository = OrdersRepository(this)
+        val loyaltyRepository = LoyaltyRepository(this)
+        val rewardsRepository = RewardsRepository(this)
+        val cartRepository = CartRepository(this)
+
+        // Initialize ViewModels with repositories
+        val cartViewModel = CartViewModel(cartRepository)
+        val ordersViewModel = OrdersViewModel(ordersRepository)
+        val loyaltyViewModel = LoyaltyViewModel()
+        val rewardsViewModel = RewardsViewModel()
+
         setContent {
             val context = LocalContext.current
             val themeManager = remember { ThemeManager(context) }
 
             TheCodeCupTheme(themeManager = themeManager) {
-                CoffeeApp(themeManager)
+                CoffeeApp(
+                    themeManager = themeManager,
+                    cartViewModel = cartViewModel,
+                    rewardsViewModel = rewardsViewModel,
+                    ordersViewModel = ordersViewModel,
+                    loyaltyViewModel = loyaltyViewModel
+                )
             }
         }
     }
 }
 
 @Composable
-fun CoffeeApp(themeManager: ThemeManager) {
+fun CoffeeApp(
+    themeManager: ThemeManager,
+    cartViewModel: CartViewModel,
+    rewardsViewModel: RewardsViewModel,
+    ordersViewModel: OrdersViewModel,
+    loyaltyViewModel: LoyaltyViewModel
+) {
     val navController = rememberNavController()
-    val cartViewModel: CartViewModel = viewModel()
-    val rewardsViewModel: RewardsViewModel = viewModel()
-    val ordersViewModel: OrdersViewModel = viewModel()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -71,15 +100,15 @@ fun CoffeeApp(themeManager: ThemeManager) {
             }
 
             composable(Screen.Home.route) {
-                HomeScreen(navController)
+                HomeScreen(navController, loyaltyViewModel)
             }
 
             composable(Screen.Rewards.route) {
-                RewardsScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel)
+                RewardsScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel, loyaltyViewModel)
             }
 
             composable(Screen.MyOrder.route) {
-                MyOrderScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel)
+                MyOrderScreen(navController, cartViewModel, rewardsViewModel, ordersViewModel, loyaltyViewModel)
             }
 
             composable(Screen.MyCart.route) {
@@ -93,9 +122,11 @@ fun CoffeeApp(themeManager: ThemeManager) {
             composable(Screen.Profile.route) {
                 ProfileScreen(navController)
             }
+
             composable(Screen.Search.route) {
                 SearchScreen(navController)
             }
+
             composable(
                 route = Screen.CoffeeDetails.route,
                 arguments = listOf(navArgument(Screen.CoffeeDetails.COFFEE_ID_ARG) {
