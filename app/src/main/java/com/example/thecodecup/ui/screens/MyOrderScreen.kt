@@ -11,15 +11,18 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.thecodecup.data.model.Order
@@ -30,6 +33,8 @@ import com.example.thecodecup.ui.viewmodel.CartViewModel
 import com.example.thecodecup.ui.viewmodel.RewardsViewModel
 import com.example.thecodecup.ui.viewmodel.OrdersViewModel
 import com.example.thecodecup.ui.viewmodel.LoyaltyViewModel
+import com.example.thecodecup.data.repository.UserPreferencesRepository
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -172,6 +177,9 @@ fun OrderCard(
     onMarkCompleted: (Order) -> Unit,
     onReorder: (Order) -> Unit
 ) {
+    val context = LocalContext.current
+    val userRepository = remember { UserPreferencesRepository(context) }
+    val userProfile by userRepository.userProfile.collectAsStateWithLifecycle()
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -185,7 +193,7 @@ fun OrderCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Header Row
+            // Header Row - Order ID and Date
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -270,9 +278,9 @@ fun OrderCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Address
+            // Info
             Text(
-                text = order.address,
+                text = "Ordered by: ${userProfile.fullName}",
                 fontSize = 13.sp,
                 color = Color.Gray,
                 maxLines = 2,
@@ -380,16 +388,4 @@ fun EmptyOrdersState(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MyOrderScreenPreview() {
-    MyOrderScreen(
-        navController = rememberNavController(),
-        cartViewModel = CartViewModel(cartRepository = TODO()),
-        rewardsViewModel = RewardsViewModel(),
-        ordersViewModel = OrdersViewModel(ordersRepository = TODO()),
-        loyaltyViewModel = LoyaltyViewModel()
-    )
 }
